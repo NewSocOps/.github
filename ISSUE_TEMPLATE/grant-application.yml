@@ -1,0 +1,85 @@
+name: Grant Application
+description: Apply for a micro-grant to support your open-source or community project
+title: "[GRANT] "
+labels: ["grant-candidate"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for applying to NewSocOps! Please provide detailed information about yourself and your project. All applications are reviewed by our community.
+
+  - type: input
+    id: country
+    attributes:
+      label: Country
+      description: Where are you based?
+      placeholder: e.g., Kenya, Brazil, India
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: Tell us about yourself, your experience with technology, and any challenges you've faced accessing opportunities.
+      placeholder: Share your story...
+    validations:
+      required: true
+
+  - type: textarea
+    id: project
+    attributes:
+      label: Project Description
+      description: What do you want to build or contribute to? Include technical details, goals, and how you plan to execute it.
+      placeholder: Describe your project...
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who will benefit from this project? How will it help your community or the broader open-source ecosystem?
+      placeholder: Explain the expected impact...
+    validations:
+      required: true
+
+  - type: input
+    id: requested_amount
+    attributes:
+      label: Requested Amount (USD)
+      description: How much funding do you need? Be specific about how you'll use the funds.
+      placeholder: e.g., $500
+    validations:
+      required: true
+
+  - type: textarea
+    id: mentorship_needs
+    attributes:
+      label: Mentorship Needs (Optional)
+      description: Would you benefit from mentorship? If yes, describe the areas where you'd like guidance.
+      placeholder: e.g., code review, architecture design, career advice
+
+  - type: dropdown
+    id: timeline
+    attributes:
+      label: Timeline
+      description: How long do you estimate this project will take?
+      options:
+        - 2 weeks
+        - 1 month
+        - 2 months
+        - 3+ months
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: consents
+    attributes:
+      label: Consents
+      description: Please confirm your understanding and agreement
+      options:
+        - label: I agree to provide a progress report upon project completion
+          required: true
+        - label: I consent to having my name and project publicly acknowledged if my grant is approved
+          required: true
