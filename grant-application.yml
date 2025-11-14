@@ -1,0 +1,71 @@
+name: Grant Application
+description: Apply for a micro‑grant to support your learning or project
+title: "Grant: <Project / Initiative>"
+labels: ["grant-candidate"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill all required fields. Keep answers concise but meaningful.
+  - type: input
+    id: country
+    attributes:
+      label: Country / Region
+      placeholder: "Kenya"
+    validations:
+      required: true
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: Your experience, focus area, tech stack
+    validations:
+      required: true
+  - type: textarea
+    id: project
+    attributes:
+      label: Project / Initiative
+      description: What you plan to build or learn and why it matters
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Expected Impact
+      description: How this support helps you progress and benefit others
+    validations:
+      required: true
+  - type: input
+    id: amount
+    attributes:
+      label: Requested Amount (USD)
+      placeholder: "200"
+    validations:
+      required: true
+  - type: textarea
+    id: mentorship
+    attributes:
+      label: Mentorship Needs (optional)
+      description: Topics or guidance you would benefit from
+    validations:
+      required: false
+  - type: dropdown
+    id: timeline
+    attributes:
+      label: Estimated Duration
+      options:
+        - 2 weeks
+        - 1 month
+        - 2 months
+        - 3+ months
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Consents
+      options:
+        - label: I will provide a short outcome report.
+          required: true
+        - label: I allow publishing my name or pseudonym in the impact report.
+          required: true
