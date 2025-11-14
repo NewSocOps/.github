@@ -1,0 +1,101 @@
+name: Label Status Updates
+
+on:
+  issues:
+    types: [labeled, unlabeled]
+
+permissions:
+  issues: write
+
+jobs:
+  status-comment:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'grant-candidate')
+    
+    steps:
+      - name: Comment on status change
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = context.payload.label.name;
+            const action = context.payload.action;
+            
+            let comment = '';
+            
+            if (action === 'labeled') {
+              switch(label) {
+                case 'approved':
+                  comment = `🎉 **Congratulations!** Your grant application has been approved!
+
+**Next Steps:**
+1. You will be contacted via the email/contact method you provided
+2. We'll discuss funding transfer details
+3. You'll receive the grant amount as specified
+4. Begin your project according to your proposed timeline
+
+**Remember:**
+- Keep us updated on your progress
+- Submit a completion report as agreed
+- Reach out if you need mentorship or guidance
+
+Welcome to the NewSocOps community! 🚀`;
+                  break;
+                  
+                case 'funded':
+                  comment = `💰 **Grant Funded!** 
+
+The funds have been transferred. You can now begin your project. Please:
+- Confirm receipt of funds
+- Update this issue with progress milestones
+- Ask for help if you encounter challenges
+
+Good luck with your project! The community is here to support you.`;
+                  break;
+                  
+                case 'needs-clarification':
+                  comment = `❓ **Additional Information Needed**
+
+Please review the comments above and provide the requested clarification. Edit your original application or reply with the additional details.
+
+Once you've updated your application, a reviewer will remove this label.`;
+                  break;
+                  
+                case 'rejected':
+                  comment = `Thank you for your application. After careful review, we're unable to fund this grant at this time.
+
+**This doesn't mean your project isn't valuable.** Common reasons include:
+- Limited funding available for this cycle
+- Project scope doesn't align with current priorities
+- Timeline or budget concerns
+
+**You're welcome to:**
+- Apply again in a future cycle with an updated proposal
+- Engage with our community for feedback and mentorship
+- Contribute to other projects in the ecosystem
+
+We appreciate your interest in NewSocOps and wish you success in your endeavors.`;
+                  break;
+                  
+                case 'completed':
+                  comment = `✅ **Project Completed!**
+
+Thank you for completing your project and submitting your report. Your contribution to the open-source community is appreciated!
+
+**What's Next:**
+- Your project may be featured in our community reports
+- Consider mentoring future grant recipients
+- Stay connected with the NewSocOps community
+
+Congratulations on your achievement! 🎊`;
+                  break;
+              }
+              
+              if (comment) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: comment
+                });
+              }
+            }

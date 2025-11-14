@@ -1,0 +1,125 @@
+name: Grant Application Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'grant-candidate')
+    
+    steps:
+      - name: Add under-review label
+        if: github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['under-review']
+            });
+
+      - name: Welcome comment
+        if: github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `Thank you for applying to NewSocOps! 🙏
+
+Your grant application has been received and will be reviewed by our community. Here's what happens next:
+
+1. **Community Review** — Community members will review your application and may ask clarifying questions
+2. **Evaluation** — The core team will evaluate your application based on impact, feasibility, and alignment with our mission
+3. **Decision** — You'll be notified of the decision (typically within 2-4 weeks)
+
+In the meantime:
+- Please respond to any questions from reviewers
+- Feel free to add more details if needed
+- Join our discussions to connect with the community
+
+**Important**: All updates will be posted here. Please enable notifications for this issue.
+
+---
+
+**For Reviewers**: Please evaluate this application considering:
+- Impact on underserved communities
+- Project feasibility and timeline
+- Applicant's background and needs
+- Budget appropriateness
+
+Use reactions to signal interest (👍 support, 👀 needs discussion, ❓ needs clarification).`;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+
+  validate-application:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'grant-candidate')
+    
+    steps:
+      - name: Check for required information
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body;
+            const issues = [];
+            
+            // Basic validation checks
+            if (!body || body.trim().length < 100) {
+              issues.push('Application appears incomplete or too short');
+            }
+            
+            // Check for key sections (based on form structure)
+            const requiredSections = [
+              'Country',
+              'Background',
+              'Project Description',
+              'Impact',
+              'Requested Amount'
+            ];
+            
+            requiredSections.forEach(section => {
+              if (!body.includes(section)) {
+                issues.push(`Missing section: ${section}`);
+              }
+            });
+            
+            // Check for placeholder text
+            if (body.includes('e.g.,') || body.includes('...')) {
+              issues.push('Application contains placeholder text - please provide actual information');
+            }
+            
+            // If issues found, add needs-clarification label and comment
+            if (issues.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ['needs-clarification']
+              });
+              
+              const comment = `⚠️ **Application Review**
+
+We noticed some issues with your application:
+
+${issues.map(issue => `- ${issue}`).join('\n')}
+
+Please edit your application to address these points. Once updated, the \`needs-clarification\` label will be removed by a reviewer.`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
